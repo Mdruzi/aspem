@@ -708,7 +708,7 @@ tr:hover td { background: #FAFBFC; }
 .ss-wrap .ss-input { width: 100%; }
 .ss-dropdown {
   position: absolute; top: calc(100% + 2px); left: 0; right: 0; z-index: 500;
-  background: var(--surface);
+  background: #FFFFFF;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   box-shadow: 0 6px 24px rgba(0,0,0,.13);
@@ -719,6 +719,7 @@ tr:hover td { background: #FAFBFC; }
 .ss-option {
   padding: 9px 12px; font-size: 13px; cursor: pointer;
   user-select: none; line-height: 1.4;
+  color: var(--text);
 }
 .ss-option:hover, .ss-option.ss-hi { background: #F1F5F9; }
 .ss-option-empty-text {

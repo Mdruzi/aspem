@@ -868,7 +868,7 @@ function renderAddOSModal() {
       <div class="form-row form-row-2" style="margin-bottom:14px">
         <div>
           <label class="field-label">Número da OS *</label>
-          <input id="os-number" class="input" placeholder="Ex: 2024-010 ou 001" />
+          <input id="os-number" class="input" placeholder="Ex: 1001" />
         </div>
         <div>
           <label class="field-label">Descrição da Obra *</label>
@@ -906,7 +906,7 @@ function renderApprovalNewOSModal(clienteId, clienteName) {
       <div class="form-row form-row-2" style="margin-bottom:14px">
         <div>
           <label class="field-label">Número da OS <span style="color:var(--danger)">*</span></label>
-          <input id="approval-os-number" class="input" placeholder="Ex: 2024-010" />
+          <input id="approval-os-number" class="input" placeholder="Ex: 1001" />
         </div>
         <div>
           <label class="field-label">Descrição da Obra <span style="color:var(--danger)">*</span></label>
