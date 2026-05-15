@@ -292,12 +292,10 @@ function renderNewReqForm(user) {
         <div class="form-row form-row-2" style="margin-bottom:14px">
           <div>
             <label class="field-label">🏢 Cliente *</label>
-            ${renderSS('req-cliente-sel', 'Buscar cliente...', [
-              ...clientes.map(c => ({ value: String(c.id), text: c.name })),
-              { value: '__novo__', text: '➕ Novo cliente (digitar)' }
-            ], defaultClienteId ? String(defaultClienteId) : '')}
-            <input id="req-cliente-input" class="input" placeholder="Nome do novo cliente..."
-              style="display:${clientes.length===0?'':'none'};margin-top:6px" />
+            ${renderSS('req-cliente-sel', 'Digite o nome do cliente ou obra...',
+              clientes.map(c => ({ value: String(c.id), text: c.name })),
+              ''
+            )}
           </div>
           <div>
             <label class="field-label">📋 Ordem de Serviço</label>

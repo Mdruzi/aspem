@@ -47,7 +47,18 @@ function initSS(wrap) {
   };
 
   input.addEventListener('focus', () => { wrap.classList.add('ss-open'); filterOpts(); });
-  input.addEventListener('input', () => { wrap.classList.add('ss-open'); filterOpts(); });
+  input.addEventListener('input', () => {
+    wrap.classList.add('ss-open');
+    filterOpts();
+    // Se o usuário edita o texto depois de ter selecionado uma opção, desfaz a seleção
+    if (hidden.value) {
+      const selText = dropdown.querySelector(`.ss-option[data-value="${CSS.escape(hidden.value)}"]`)?.textContent.trim() || '';
+      if (input.value.trim() !== selText) {
+        hidden.value = '';
+        wrap.dispatchEvent(new CustomEvent('ss-change', { bubbles: true, detail: { value: '', text: input.value } }));
+      }
+    }
+  });
 
   dropdown.addEventListener('click', e => {
     const opt = e.target.closest('.ss-option');
@@ -663,20 +674,12 @@ function bindNewReqView() {
   // Inicializa os searchable selects do formulário
   initSearchableSelects();
 
-  // Cliente: ao escolher "Novo cliente", exibe input de texto livre; caso contrário, repopula OS
+  // Ao selecionar um cliente existente, popula o dropdown de OS; ao desselecionar, limpa
   const allOses = getOSes().filter(o => o.active);
   document.getElementById('req-cliente-sel-wrap')?.addEventListener('ss-change', e => {
-    const input     = document.getElementById('req-cliente-input');
-    const clienteId = parseInt(e.detail.value);
-
-    if (e.detail.value === '__novo__') {
-      if (input) { input.style.display = ''; input.value = ''; input.focus(); }
-      rebuildSS('req-os-sel', []);
-    } else {
-      if (input) { input.style.display = 'none'; input.value = ''; }
-      const oses = clienteId ? allOses.filter(o => o.clienteId === clienteId) : [];
-      rebuildSS('req-os-sel', oses.map(o => ({ value: String(o.id), text: `${o.osNumber} — ${o.description}` })));
-    }
+    const clienteId = e.detail.value ? parseInt(e.detail.value) : null;
+    const oses = clienteId ? allOses.filter(o => o.clienteId === clienteId) : [];
+    rebuildSS('req-os-sel', oses.map(o => ({ value: String(o.id), text: `${o.osNumber} — ${o.description}` })));
     const descEl = document.getElementById('req-os-desc');
     if (descEl) descEl.textContent = '';
   });
@@ -690,21 +693,22 @@ function bindNewReqView() {
   });
 
   document.getElementById('btn-submit-req')?.addEventListener('click', ()=>{
-    const clienteHidden = document.getElementById('req-cliente-sel');   // hidden input inside SS
-    const clienteInput  = document.getElementById('req-cliente-input');
-    const osHidden      = document.getElementById('req-os-sel');        // hidden input inside SS
+    const clienteWrap  = document.getElementById('req-cliente-sel-wrap');
+    const clienteHidden = document.getElementById('req-cliente-sel');  // hidden input do SS
+    const clienteText  = clienteWrap?.querySelector('.ss-input')?.value.trim() || '';
+    const osHidden     = document.getElementById('req-os-sel');        // hidden input do SS
 
-    // Resolve cliente
+    // Resolve cliente: se selecionou da lista usa o ID; senão usa o texto digitado como novo
     let clienteId   = null;
     let clienteName = '';
-    if (clienteHidden?.value === '__novo__') {
-      clienteName = clienteInput?.value.trim() || '';
-    } else if (clienteHidden?.value) {
+    if (clienteHidden?.value) {
       clienteId   = parseInt(clienteHidden.value);
-      clienteName = getClientes().find(c => c.id === clienteId)?.name || '';
+      clienteName = getClientes().find(c => c.id === clienteId)?.name || clienteText;
+    } else if (clienteText) {
+      clienteName = clienteText; // será criado em addRequisition
     }
 
-    // alias para o restante do handler
+    // alias mantido para compatibilidade com o restante do handler
     const clienteSel = clienteHidden;
     const osSel      = osHidden;
 
@@ -721,7 +725,7 @@ function bindNewReqView() {
     const necessity = document.getElementById('req-necessity').value.trim();
     const deadline  = document.getElementById('req-deadline').value;
 
-    if (!clienteName && !clienteId) { showToast('Selecione ou informe o cliente.','error'); return; }
+    if (!clienteName && !clienteId) { showToast('Digite o nome do cliente ou da obra.','error'); return; }
     if (!deadline) { showToast('Informe o prazo máximo de entrega.','error'); return; }
 
     const items = [];
