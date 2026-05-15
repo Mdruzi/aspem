@@ -378,6 +378,19 @@ function bindDetailView() {
       }
     };
 
+    // Aceitar todos os itens de uma vez
+    document.getElementById('btn-approve-all')?.addEventListener('click', () => {
+      document.querySelectorAll('.approval-item-row').forEach(row => {
+        row.dataset.status = 'approved';
+        row.style.opacity = '1';
+        const apprBtn = row.querySelector('.btn-item-approve');
+        const rejBtn  = row.querySelector('.btn-item-reject');
+        if (apprBtn) { apprBtn.style.background = '#10B981'; apprBtn.style.color = '#fff'; }
+        if (rejBtn)  { rejBtn.style.background  = '#E2E8F0'; rejBtn.style.color  = '#94A3B8'; }
+      });
+      updateProgress();
+    });
+
     document.querySelectorAll('.btn-item-approve').forEach(btn => {
       btn.addEventListener('click', () => {
         const row = btn.closest('.approval-item-row');

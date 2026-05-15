@@ -144,6 +144,11 @@ function renderReqDetail(req, user) {
           </div>
         </div>
         
+        <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+          <button class="btn btn-success btn-sm" id="btn-approve-all" title="Aprovar todos os itens com as quantidades solicitadas">
+            ✅ Aceitar Todos
+          </button>
+        </div>
         <div class="table-wrap" style="margin-bottom:16px">
           <table style="background:#F8FAFC">
             <thead>
