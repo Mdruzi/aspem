@@ -129,14 +129,20 @@ function renderReqDetail(req, user) {
             <div class="fw-bold" style="padding:8px 0;font-size:13px">${req.clienteName||'—'}</div>
           </div>
           <div>
-            <label class="field-label">📋 OS Vinculada</label>
-            <div style="padding:8px 0;font-size:13px">
-              ${req.osNumber ? `<span class="fw-bold">${req.osNumber}</span>` : '<span style="color:var(--text-muted)">Não informada</span>'}
-              ${req.osDescription ? `<div style="font-size:11px;color:var(--text-muted);margin-top:2px">${req.osDescription}</div>` : ''}
+            <label class="field-label">
+              📋 OS Vinculada&nbsp;<span style="color:var(--danger)">*</span>
+              <span style="font-weight:400;font-size:11px;color:var(--text-muted)"> — obrigatório para aprovar</span>
+            </label>
+            ${renderSS('coord-os-sel', 'Selecionar / buscar OS...', [
+              ...getOSes().filter(o => o.active && (!req.clienteId || o.clienteId === req.clienteId))
+                .map(o => ({ value: String(o.id), text: `${o.osNumber} — ${o.description}` })),
+              { value: '__nova__', text: '➕ Cadastrar Nova OS' }
+            ], req.osId ? String(req.osId) : '')}
+            <div id="coord-os-desc" style="font-size:11px;color:var(--text-muted);margin-top:4px;min-height:14px">
+              ${req.osDescription ? `📝 ${req.osDescription}` : ''}
             </div>
           </div>
         </div>
-        <input type="hidden" id="coord-os" value="${req.osNumber||''}" />
         
         <div class="table-wrap" style="margin-bottom:16px">
           <table style="background:#F8FAFC">
@@ -870,6 +876,56 @@ function renderAddOSModal() {
     <div class="modal-footer">
       <button class="btn btn-secondary" id="modal-close2">Cancelar</button>
       <button class="btn btn-primary" id="btn-save-os">Salvar OS</button>
+    </div>
+  </div>`;
+}
+
+// ── MODAL: NOVA OS NO FLUXO DE APROVAÇÃO ─────────────────────
+function renderApprovalNewOSModal(clienteId, clienteName) {
+  const clientes = getClientes().filter(c => c.active);
+  return `
+  <div class="modal" style="max-width:540px">
+    <div class="modal-header">
+      <div class="modal-title">📋 Cadastrar Nova OS</div>
+      <button class="modal-close" id="modal-close">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row" style="margin-bottom:14px">
+        <div>
+          <label class="field-label">Cliente</label>
+          ${clienteId
+            ? `<div class="fw-bold" style="padding:8px 0;font-size:13px;color:var(--text)">${clienteName||'—'}</div>
+               <input type="hidden" id="approval-os-cliente-id" value="${clienteId}" />`
+            : renderSS('approval-os-cliente-sel', 'Selecione o cliente...', clientes.map(c=>({value:String(c.id),text:c.name})), '')
+          }
+        </div>
+      </div>
+      <div class="form-row form-row-2" style="margin-bottom:14px">
+        <div>
+          <label class="field-label">Número da OS <span style="color:var(--danger)">*</span></label>
+          <input id="approval-os-number" class="input" placeholder="Ex: 2024-010" />
+        </div>
+        <div>
+          <label class="field-label">Descrição da Obra <span style="color:var(--danger)">*</span></label>
+          <input id="approval-os-description" class="input" placeholder="Ex: SPDA — Bloco C" />
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
+          📊 Orçamento de Materiais &nbsp;<span style="font-weight:400;font-size:11px;color:var(--text-light)">(opcional)</span>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px">
+          Importe uma planilha com os materiais previstos. Colunas: A = material · B = quantidade · C = unidade.
+        </p>
+        <input type="file" id="approval-budget-file" accept=".xlsx,.xls,.csv"
+          style="padding:6px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;width:100%" />
+        <div id="approval-budget-preview" style="margin-top:8px;font-size:12px;color:var(--success);min-height:16px"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="modal-close2">Cancelar</button>
+      <button class="btn btn-primary" id="btn-save-approval-os">✅ Salvar OS e Vincular</button>
     </div>
   </div>`;
 }

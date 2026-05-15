@@ -340,6 +340,23 @@ function bindDetailView() {
   document.getElementById('btn-back')?.addEventListener('click', ()=>{ state.view='list'; render(); });
   document.getElementById('btn-print-pdf')?.addEventListener('click', ()=>printReqPDF(req));
 
+  // Inicializa SS do detalhe (campo OS na aprovação)
+  initSearchableSelects();
+
+  // SS de OS na aprovação: "Nova OS" abre modal; demais atualizam descrição
+  document.getElementById('coord-os-sel-wrap')?.addEventListener('ss-change', e => {
+    if (e.detail.value === '__nova__') {
+      overlay.innerHTML = renderApprovalNewOSModal(req.clienteId, req.clienteName);
+      overlay.classList.remove('hidden');
+      bindApprovalNewOSModal(req);
+    } else {
+      const osId = parseInt(e.detail.value);
+      const osObj = osId ? getOSById(osId) : null;
+      const el = document.getElementById('coord-os-desc');
+      if (el) el.textContent = osObj?.description ? `📝 ${osObj.description}` : '';
+    }
+  });
+
   // Approval actions (Coordenador, Gestão, Admin)
   const approveBtn = document.getElementById('btn-approve');
   if (approveBtn) {
@@ -385,7 +402,15 @@ function bindDetailView() {
     });
 
     approveBtn.addEventListener('click', ()=>{
-      const os = document.getElementById('coord-os').value.trim();
+      // OS é obrigatório para aprovar
+      const osHidden = document.getElementById('coord-os-sel');
+      const osId = osHidden?.value ? parseInt(osHidden.value) : null;
+      if (!osId) {
+        showToast('Selecione a OS vinculada antes de aprovar.', 'error');
+        document.getElementById('coord-os-sel-wrap')?.querySelector('.ss-input')?.focus();
+        return;
+      }
+      const osObj = getOSById(osId);
       const approverName = state.user.name;
 
       let hasPending = false;
@@ -432,8 +457,13 @@ function bindDetailView() {
       }
 
       updateRequisition(req.id, {
-        status:'aprovado', approvedAt:todayStr(), osNumber:os||req.osNumber,
-        approvedByName: approverName, items: updatedItems
+        status: 'aprovado',
+        approvedAt: todayStr(),
+        approvedByName: approverName,
+        items: updatedItems,
+        osId: osObj?.id       ?? req.osId,
+        osNumber: osObj?.osNumber      ?? req.osNumber,
+        osDescription: osObj?.description ?? req.osDescription,
       });
 
       const changed = updatedItems.filter(it => it.originalQty != null).length;
@@ -468,8 +498,16 @@ function bindDetailView() {
   document.getElementById('btn-reject-confirm')?.addEventListener('click', ()=>{
     const note = document.getElementById('reject-note').value.trim();
     if (!note) { showToast('Informe o motivo da rejeição.','error'); return; }
-    const os = document.getElementById('coord-os').value.trim();
-    updateRequisition(req.id, { status:'rejeitado', rejectNote:note, osNumber:os||req.osNumber });
+    const osHidden = document.getElementById('coord-os-sel');
+    const osId = osHidden?.value ? parseInt(osHidden.value) : null;
+    const osObj = osId ? getOSById(osId) : null;
+    updateRequisition(req.id, {
+      status: 'rejeitado',
+      rejectNote: note,
+      osId:          osObj?.id          ?? req.osId,
+      osNumber:      osObj?.osNumber     ?? req.osNumber,
+      osDescription: osObj?.description  ?? req.osDescription,
+    });
     showToast('Requisição rejeitada.','error');
     state.view='list'; render();
   });
@@ -1007,6 +1045,96 @@ function bindObrasPanel() {
     const osNumber  = getOsFilterVal() || null;
     if (!osNumber && !clienteId) { showToast('Selecione um cliente ou uma OS primeiro.', 'error'); return; }
     exportObraHistory({ osNumber, clienteId });
+  });
+}
+
+function bindApprovalNewOSModal(req) {
+  const closeModal = () => { overlay.classList.add('hidden'); overlay.innerHTML = ''; };
+  document.getElementById('modal-close')?.addEventListener('click', closeModal);
+  document.getElementById('modal-close2')?.addEventListener('click', closeModal);
+  initSearchableSelects();
+
+  // Mostra nome do arquivo selecionado
+  document.getElementById('approval-budget-file')?.addEventListener('change', e => {
+    const file = e.target.files[0];
+    const preview = document.getElementById('approval-budget-preview');
+    if (preview) preview.textContent = file ? `📎 ${file.name}` : '';
+  });
+
+  document.getElementById('btn-save-approval-os')?.addEventListener('click', async () => {
+    // Resolve clienteId
+    let clienteId = null;
+    const hiddenCli = document.getElementById('approval-os-cliente-id');
+    const ssCli     = document.getElementById('approval-os-cliente-sel');
+    if (hiddenCli) clienteId = parseInt(hiddenCli.value);
+    else if (ssCli?.value) clienteId = parseInt(ssCli.value);
+
+    const osNumber    = document.getElementById('approval-os-number')?.value.trim();
+    const description = document.getElementById('approval-os-description')?.value.trim();
+
+    if (!clienteId)   { showToast('Selecione o cliente.', 'error'); return; }
+    if (!osNumber)    { showToast('Informe o número da OS.', 'error'); return; }
+    if (!description) { showToast('Informe a descrição da obra.', 'error'); return; }
+
+    const newOS = addOS({ clienteId, osNumber, description });
+
+    // Importar orçamento se fornecido (opcional)
+    const budgetFile = document.getElementById('approval-budget-file')?.files[0];
+    if (budgetFile) {
+      try {
+        await loadSheetJS();
+        await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = ev => {
+            try {
+              const wb   = XLSX.read(ev.target.result, { type: 'array' });
+              const ws   = wb.Sheets[wb.SheetNames[0]];
+              const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+              const first = rows[0] || [];
+              const hasHeader = first.some(c => /material|nome|item|descri/i.test(String(c)));
+              const dataRows  = hasHeader ? rows.slice(1) : rows;
+              const items = [];
+              dataRows.forEach(row => {
+                const name = String(row[0] || '').trim();
+                const qty  = parseFloat(String(row[1] || '0').replace(',', '.')) || 0;
+                const unit = String(row[2] || '').trim() || 'un';
+                if (name && qty > 0) items.push({ name, qty, unit });
+              });
+              if (items.length) {
+                saveBudgetForOS(newOS.id, items);
+                showToast(`${items.length} itens do orçamento importados! ✅`);
+              }
+              resolve();
+            } catch (err) { reject(err); }
+          };
+          reader.onerror = reject;
+          reader.readAsArrayBuffer(budgetFile);
+        });
+      } catch (err) {
+        showToast('Aviso: não foi possível ler o orçamento. ' + err.message, 'error');
+      }
+    }
+
+    showToast(`OS ${osNumber} cadastrada e vinculada! ✅`);
+    closeModal();
+
+    // Repopula o SS de OS na tela de aprovação e seleciona a nova OS
+    const allOSes = getOSes().filter(o => o.active && (!req.clienteId || o.clienteId === req.clienteId));
+    rebuildSS('coord-os-sel', [
+      ...allOSes.map(o => ({ value: String(o.id), text: `${o.osNumber} — ${o.description}` })),
+      { value: '__nova__', text: '➕ Cadastrar Nova OS' }
+    ]);
+
+    // Seleciona a nova OS manualmente
+    const wrap = document.getElementById('coord-os-sel-wrap');
+    if (wrap) {
+      const inp = wrap.querySelector('.ss-input');
+      const hid = wrap.querySelector('.ss-hidden');
+      if (inp) inp.value = `${newOS.osNumber} — ${newOS.description}`;
+      if (hid) hid.value = String(newOS.id);
+    }
+    const descEl = document.getElementById('coord-os-desc');
+    if (descEl) descEl.textContent = `📝 ${newOS.description}`;
   });
 }
 
