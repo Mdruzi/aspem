@@ -932,28 +932,101 @@ function bindAdminPanel() {
 }
 
 function bindUserModal() {
-  const closeModal = () => { overlay.classList.add('hidden'); overlay.innerHTML=''; };
+  const closeModal = () => { overlay.classList.add('hidden'); overlay.innerHTML = ''; };
   document.getElementById('modal-close-user')?.addEventListener('click', closeModal);
   document.getElementById('modal-cancel-user')?.addEventListener('click', closeModal);
   initSearchableSelects();
 
+  // ── Helpers visuais do bloco obra ──────────────────────────
+  const section  = document.getElementById('user-obra-section');
+  const badge    = document.getElementById('user-obra-badge');
+  const required = document.getElementById('user-obra-required');
+  const infoEl   = document.getElementById('user-obra-info');
+  const newForm  = document.getElementById('user-obra-new-form');
+
+  const highlightObra = (isObra) => {
+    if (!section) return;
+    section.style.border       = isObra ? '2px solid var(--primary)' : '2px solid var(--border)';
+    section.style.background   = isObra ? 'rgba(27,79,216,0.04)'     : 'var(--surface)';
+    if (badge)    badge.style.display    = isObra ? 'inline' : 'none';
+    if (required) required.style.display = isObra ? 'inline' : 'none';
+  };
+
+  const updateObraInfo = (clienteId) => {
+    if (!infoEl) return;
+    if (!clienteId) { infoEl.textContent = ''; return; }
+    const oses = getOSes().filter(o => o.clienteId === clienteId);
+    infoEl.textContent = oses.length
+      ? `📋 ${oses.length} OS${oses.length!==1?'s':''}: ${oses.map(o=>o.osNumber).join(', ')}`
+      : '📋 Nenhuma OS cadastrada ainda para este cliente';
+  };
+
+  // Reage à troca de perfil
+  document.getElementById('user-role')?.addEventListener('change', e => {
+    highlightObra(e.target.value === 'obra');
+  });
+
+  // Reage à seleção de cliente no SS
+  document.getElementById('user-obra-wrap')?.addEventListener('ss-change', e => {
+    if (e.detail.value === '__novo__') {
+      if (newForm) { newForm.style.display = ''; }
+      document.getElementById('user-obra-new-name')?.focus();
+      updateObraInfo(null);
+    } else {
+      if (newForm) newForm.style.display = 'none';
+      updateObraInfo(e.detail.value ? parseInt(e.detail.value) : null);
+    }
+  });
+
+  // Cancelar novo cliente
+  document.getElementById('btn-user-obra-cancel')?.addEventListener('click', () => {
+    if (newForm) newForm.style.display = 'none';
+    rebuildSS('user-obra', [
+      { value: '', text: '— Nenhum —' },
+      ...getClientes().map(c => ({ value: String(c.id), text: c.name })),
+      { value: '__novo__', text: '➕ Cadastrar novo cliente agora' }
+    ], 'Buscar ou selecionar cliente...');
+  });
+
+  // Confirmar novo cliente inline
+  document.getElementById('btn-user-obra-confirm')?.addEventListener('click', () => {
+    const name = document.getElementById('user-obra-new-name')?.value.trim();
+    if (!name) { showToast('Informe o nome do cliente.', 'error'); return; }
+
+    const novoCliente = addCliente(name);
+    if (newForm) newForm.style.display = 'none';
+
+    // Reconstrói SS já com o novo cliente selecionado
+    rebuildSS('user-obra', [
+      { value: '', text: '— Nenhum —' },
+      ...getClientes().map(c => ({ value: String(c.id), text: c.name })),
+      { value: '__novo__', text: '➕ Cadastrar novo cliente agora' }
+    ]);
+    const wrap = document.getElementById('user-obra-wrap');
+    if (wrap) {
+      wrap.querySelector('.ss-input').value  = novoCliente.name;
+      wrap.querySelector('.ss-hidden').value = String(novoCliente.id);
+    }
+    updateObraInfo(novoCliente.id);
+    showToast(`Cliente "${name}" criado e vinculado! ✅`);
+  });
+
+  // ── Salvar usuário ─────────────────────────────────────────
   document.getElementById('btn-save-user')?.addEventListener('click', () => {
-    const idStr = document.getElementById('user-id').value;
-    const isEdit = !!idStr;
-    const name = document.getElementById('user-name').value.trim();
+    const idStr    = document.getElementById('user-id').value;
+    const isEdit   = !!idStr;
+    const name     = document.getElementById('user-name').value.trim();
     const username = document.getElementById('user-username').value.trim();
     const password = document.getElementById('user-password').value;
-    const role = document.getElementById('user-role').value;
-    const clienteIdRaw = document.getElementById('user-obra').value;
-    const clienteId = clienteIdRaw ? parseInt(clienteIdRaw) : null;
+    const role     = document.getElementById('user-role').value;
+    const clienteIdRaw = document.getElementById('user-obra')?.value;
+    const clienteId    = clienteIdRaw ? parseInt(clienteIdRaw) : null;
 
     if (!name || !username || !password || !role) {
-      showToast('Preencha todos os campos obrigatórios.', 'error');
-      return;
+      showToast('Preencha todos os campos obrigatórios.', 'error'); return;
     }
 
     const userData = { name, username, password, role, clienteId };
-
     if (isEdit) {
       updateUser(parseInt(idStr), userData);
       showToast('Usuário atualizado com sucesso!');
@@ -961,9 +1034,7 @@ function bindUserModal() {
       addUser(userData);
       showToast('Usuário criado com sucesso!');
     }
-
-    closeModal();
-    render();
+    closeModal(); render();
   });
 }
 

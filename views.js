@@ -296,19 +296,51 @@ function renderAddUserModal(user = null) {
           <input id="user-password" class="input" type="password" placeholder="••••••" value="${user ? user.password : ''}" />
         </div>
       </div>
-      <div class="form-row form-row-2" style="margin-bottom:12px">
+      <div class="form-row" style="margin-bottom:12px">
         <div>
           <label class="field-label">Perfil de Acesso *</label>
           <select id="user-role" class="select">
             ${Object.entries(ROLES).map(([k, v]) => `<option value="${k}" ${user && user.role === k ? 'selected' : ''}>${v}</option>`).join('')}
           </select>
         </div>
-        <div>
-          <label class="field-label">Cliente vinculado (opcional)</label>
-          ${renderSS('user-obra', '— Nenhum —', [
-            { value: '', text: '— Nenhum —' },
-            ...getClientes().map(c => ({ value: String(c.id), text: c.name }))
-          ], user && user.clienteId ? String(user.clienteId) : '')}
+      </div>
+
+      <!-- Bloco Cliente / Obra — destacado quando perfil = obra -->
+      <div id="user-obra-section" style="margin-bottom:12px;padding:14px 16px;border-radius:8px;border:2px solid ${(user?.role==='obra')?'var(--primary)':'var(--border)'};background:${(user?.role==='obra')?'rgba(27,79,216,0.04)':'var(--surface)'}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
+          <label class="field-label" style="margin-bottom:0;font-size:13px">
+            🏗️ Cliente / Obra vinculada
+            <span id="user-obra-required" style="color:var(--danger);display:${(user?.role==='obra')?'inline':'none'}"> *</span>
+          </label>
+          <span id="user-obra-badge" style="font-size:11px;padding:2px 8px;border-radius:20px;background:var(--primary);color:#fff;font-weight:600;display:${(user?.role==='obra')?'inline':'none'}">
+            Recomendado para encarregados
+          </span>
+        </div>
+
+        ${renderSS('user-obra', 'Buscar ou selecionar cliente...', [
+          { value: '', text: '— Nenhum —' },
+          ...getClientes().map(c => ({ value: String(c.id), text: c.name })),
+          { value: '__novo__', text: '➕ Cadastrar novo cliente agora' }
+        ], user && user.clienteId ? String(user.clienteId) : '')}
+
+        <!-- Mini-formulário inline para novo cliente -->
+        <div id="user-obra-new-form" style="display:none;margin-top:10px;padding:10px 12px;background:#F1F5F9;border:1px dashed var(--primary);border-radius:6px">
+          <div style="font-size:11px;font-weight:700;color:var(--primary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">➕ Novo Cliente</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="user-obra-new-name" class="input" placeholder="Nome do cliente / obra..." style="flex:1;font-size:13px" />
+            <button type="button" class="btn btn-primary btn-sm" id="btn-user-obra-confirm" style="white-space:nowrap">Criar e vincular</button>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-user-obra-cancel">×</button>
+          </div>
+        </div>
+
+        <div id="user-obra-info" style="margin-top:6px;font-size:12px;color:var(--text-muted);min-height:16px">
+          ${(()=>{
+            if (!user?.clienteId) return '';
+            const oses = getOSes().filter(o => o.clienteId === user.clienteId);
+            return oses.length
+              ? `📋 ${oses.length} OS${oses.length!==1?'s':''} cadastrada${oses.length!==1?'s':''}: ${oses.map(o=>o.osNumber).join(', ')}`
+              : '📋 Nenhuma OS cadastrada ainda para este cliente';
+          })()}
         </div>
       </div>
     </div>
