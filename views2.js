@@ -617,45 +617,141 @@ function renderAddMaterialModal() {
   </div>`;
 }
 
+// Gera resumo de materiais requisitados por OS
+function getOSSummary(osId, osNumber) {
+  const reqs = getRequisitions().filter(r =>
+    (osId && r.osId === osId) || (osNumber && r.osNumber === osNumber)
+  );
+  const totalReqs = reqs.length;
+  const statuses  = {};
+  const materials = {};
+  reqs.forEach(r => {
+    statuses[r.status] = (statuses[r.status] || 0) + 1;
+    r.items.forEach(it => {
+      const name = it.name || it.description || 'Material';
+      if (!materials[name]) materials[name] = { qty: 0, unit: it.unit || 'un', approved: 0, rejected: 0 };
+      const qty = parseFloat(it.qty) || 0;
+      materials[name].qty += qty;
+      if (it.approved === false) materials[name].rejected += qty;
+      else materials[name].approved += qty;
+    });
+  });
+  return { totalReqs, statuses, materials };
+}
+
+function renderOSSummaryPanel(osId, osNumber, osDescription) {
+  const { totalReqs, statuses, materials } = getOSSummary(osId, osNumber);
+  const matList   = Object.entries(materials).sort((a,b) => b[1].qty - a[1].qty);
+  const totalItens = matList.length;
+  const entregues  = statuses['entregue'] || 0;
+  const pendentes  = statuses['pendente'] || 0;
+  const aprovados  = (statuses['aprovado'] || 0) + (statuses['cotacao'] || 0) + (statuses['comprado'] || 0);
+
+  if (totalReqs === 0) return `
+    <div style="padding:16px 20px;color:var(--text-muted);font-size:13px;text-align:center">
+      Nenhuma requisição encontrada para esta OS.
+    </div>`;
+
+  const top = matList.slice(0, 6);
+  const rest = matList.length - top.length;
+
+  return `
+  <div class="os-summary-panel">
+    <div class="os-summary-kpis">
+      <div class="os-kpi">
+        <div class="os-kpi-val">${totalReqs}</div>
+        <div class="os-kpi-label">Requisições</div>
+      </div>
+      <div class="os-kpi">
+        <div class="os-kpi-val">${totalItens}</div>
+        <div class="os-kpi-label">Materiais distintos</div>
+      </div>
+      <div class="os-kpi" style="color:var(--success)">
+        <div class="os-kpi-val">${entregues}</div>
+        <div class="os-kpi-label">Entregues</div>
+      </div>
+      <div class="os-kpi" style="color:${pendentes>0?'var(--danger)':'var(--text-muted)'}">
+        <div class="os-kpi-val">${pendentes}</div>
+        <div class="os-kpi-label">Pendentes</div>
+      </div>
+      ${aprovados > 0 ? `<div class="os-kpi" style="color:#3B82F6">
+        <div class="os-kpi-val">${aprovados}</div>
+        <div class="os-kpi-label">Em andamento</div>
+      </div>` : ''}
+    </div>
+    ${top.length > 0 ? `
+    <div style="margin-top:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
+        📦 Materiais mais requisitados
+      </div>
+      <div class="os-mat-list">
+        ${top.map(([name, d]) => `
+          <div class="os-mat-row">
+            <span class="os-mat-name">${name}</span>
+            <span class="os-mat-qty">${d.qty % 1 === 0 ? d.qty : d.qty.toFixed(2)} ${d.unit}</span>
+            ${d.rejected > 0 ? `<span style="font-size:10px;color:var(--danger);margin-left:6px">(${d.rejected} rejeit.)</span>` : ''}
+          </div>`).join('')}
+        ${rest > 0 ? `<div style="font-size:11px;color:var(--text-muted);padding:6px 0">+${rest} outro(s) material(is)…</div>` : ''}
+      </div>
+    </div>` : ''}
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm btn-ver-historico-os"
+        data-os-number="${osNumber}"
+        style="gap:6px">📋 Ver histórico completo</button>
+    </div>
+  </div>`;
+}
+
 function renderObrasUnifiedTable(rows) {
   if (!rows.length) return `<div class="empty-state" style="padding:40px">
     <div class="empty-state-icon">🔎</div>
     <div class="empty-state-title">Nenhum resultado encontrado</div>
   </div>`;
 
-  // Group by cliente for visual separation
   let lastClienteId = null;
   const rowsHtml = rows.map(({ cliente: c, os: o }) => {
     const isNewGroup = c.id !== lastClienteId;
     lastClienteId = c.id;
-    if (!o) {
-      // Client without any OS
-      return `
-      ${isNewGroup ? `<tr class="obras-group-header"><td colspan="5" style="background:#F8FAFC;padding:10px 16px;font-weight:700;font-size:13px;color:var(--primary);border-bottom:1px solid var(--border)">
+
+    const clienteHeader = isNewGroup ? `
+    <tr class="obras-group-header">
+      <td colspan="5" style="background:#F8FAFC;padding:10px 16px;font-weight:700;font-size:13px;color:var(--primary);border-bottom:1px solid var(--border)">
         🏢 ${c.name}
         <span class="badge" style="margin-left:8px;background:${c.active?'#ECFDF5':'#FEF2F2'};color:${c.active?'#10B981':'#EF4444'}">${c.active?'Ativo':'Inativo'}</span>
         <button class="btn btn-secondary btn-sm obra-toggle" data-obra-id="${c.id}" style="margin-left:8px">${c.active?'Desativar':'Ativar'}</button>
         <button class="btn btn-danger btn-sm obra-delete" data-obra-id="${c.id}" title="Excluir cliente" style="margin-left:4px">🗑</button>
-      </td></tr>` : ''}
-      <tr><td colspan="5" style="padding:10px 16px;color:var(--text-muted);font-size:12px">Nenhuma OS cadastrada — <button class="btn-link btn-add-os-for-cliente" data-cliente-id="${c.id}" data-cliente-name="${c.name.replace(/"/g,'&quot;')}">+ Adicionar OS</button></td></tr>`;
-    }
-    return `
-    ${isNewGroup ? `<tr class="obras-group-header"><td colspan="5" style="background:#F8FAFC;padding:10px 16px;font-weight:700;font-size:13px;color:var(--primary);border-bottom:1px solid var(--border)">
-      🏢 ${c.name}
-      <span class="badge" style="margin-left:8px;background:${c.active?'#ECFDF5':'#FEF2F2'};color:${c.active?'#10B981':'#EF4444'}">${c.active?'Ativo':'Inativo'}</span>
-      <button class="btn btn-secondary btn-sm obra-toggle" data-obra-id="${c.id}" style="margin-left:8px">${c.active?'Desativar':'Ativar'}</button>
-      <button class="btn btn-danger btn-sm obra-delete" data-obra-id="${c.id}" title="Excluir cliente" style="margin-left:4px">🗑</button>
-      <button class="btn btn-primary btn-sm btn-add-os-for-cliente" data-cliente-id="${c.id}" data-cliente-name="${c.name.replace(/"/g,'&quot;')}" style="margin-left:8px">+ OS</button>
-    </td></tr>` : ''}
-    <tr style="border-bottom:1px solid var(--border)">
-      <td style="padding:10px 16px 10px 28px;font-family:'Courier New',monospace;font-weight:700;white-space:nowrap">${o.osNumber}</td>
-      <td style="padding:10px 16px">${o.description}</td>
+        <button class="btn btn-primary btn-sm btn-add-os-for-cliente" data-cliente-id="${c.id}" data-cliente-name="${c.name.replace(/"/g,'&quot;')}" style="margin-left:8px">+ OS</button>
+      </td>
+    </tr>` : '';
+
+    if (!o) return `${clienteHeader}
+      <tr>
+        <td colspan="5" style="padding:10px 16px 10px 28px;color:var(--text-muted);font-size:12px">
+          Nenhuma OS cadastrada —
+          <button class="btn-link btn-add-os-for-cliente" data-cliente-id="${c.id}" data-cliente-name="${c.name.replace(/"/g,'&quot;')}">+ Adicionar OS</button>
+        </td>
+      </tr>`;
+
+    const summary = renderOSSummaryPanel(o.id, o.osNumber, o.description);
+
+    return `${clienteHeader}
+    <tr class="os-row" data-os-id="${o.id}" title="Clique para ver resumo desta OS">
+      <td style="padding:10px 16px 10px 28px;white-space:nowrap">
+        <span class="os-expand-icon" data-os-id="${o.id}">▶</span>
+        <span style="font-family:'Courier New',monospace;font-weight:700;margin-left:6px">${o.osNumber}</span>
+      </td>
+      <td style="padding:10px 16px;color:var(--text)">${o.description}</td>
       <td style="padding:10px 8px;text-align:center">
         <span class="badge" style="background:${o.active?'#ECFDF5':'#FEF2F2'};color:${o.active?'#10B981':'#EF4444'}">${o.active?'Ativa':'Inativa'}</span>
       </td>
-      <td style="padding:10px 16px;text-align:right;white-space:nowrap">
+      <td style="padding:10px 16px;text-align:right;white-space:nowrap" onclick="event.stopPropagation()">
         <button class="btn btn-secondary btn-sm os-toggle" data-os-id="${o.id}">${o.active?'Desativar':'Ativar'}</button>
         <button class="btn btn-danger btn-sm os-delete" data-os-id="${o.id}" title="Excluir OS" style="margin-left:4px">🗑</button>
+      </td>
+    </tr>
+    <tr class="os-detail-row" id="os-detail-${o.id}" style="display:none">
+      <td colspan="4" style="padding:0;border-bottom:2px solid var(--primary);background:#FAFBFF">
+        ${summary}
       </td>
     </tr>`;
   }).join('');
@@ -667,7 +763,6 @@ function renderObrasUnifiedTable(rows) {
         <th style="padding:10px 16px;text-align:left;font-size:12px;color:var(--text-muted);font-weight:600">Descrição</th>
         <th style="padding:10px 8px;text-align:center;font-size:12px;color:var(--text-muted);font-weight:600">Status</th>
         <th style="padding:10px 16px;text-align:right;font-size:12px;color:var(--text-muted);font-weight:600">Ações</th>
-        <th></th>
       </tr>
     </thead>
     <tbody>${rowsHtml}</tbody>

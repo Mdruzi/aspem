@@ -10,7 +10,7 @@ const state = {
   obraFilter: '',
   search: '',
   alertDismissed: false,
-  itemCount: 1,
+  itemCount: 0,
 };
 
 const app = document.getElementById('app');
@@ -380,7 +380,7 @@ function bindView(reqs) {
 
 // LIST VIEW
 function bindListView(reqs) {
-  document.getElementById('btn-new-req')?.addEventListener('click', ()=>{ state.view='new-req'; state.itemCount=1; render(); });
+  document.getElementById('btn-new-req')?.addEventListener('click', ()=>{ state.view='new-req'; state.itemCount=0; render(); });
   document.getElementById('btn-export')?.addEventListener('click', ()=>exportCSV(getFilteredReqs(reqs)));
 
   const searchEl = document.getElementById('search-input');
@@ -1181,6 +1181,55 @@ function bindObrasPanel() {
         overlay.innerHTML = renderAddOSModalForCliente(clienteId, clienteName);
         overlay.classList.remove('hidden');
         bindOSModalForCliente(clienteId);
+      });
+    });
+
+    // ── OS rows: accordion com resumo de materiais ──
+    document.querySelectorAll('.os-row').forEach(row => {
+      row.addEventListener('click', e => {
+        // Botões de ação já têm stopPropagation no HTML; aqui guardamos só clique na linha
+        const osId = row.dataset.osId;
+        const detailRow = document.getElementById(`os-detail-${osId}`);
+        const icon      = row.querySelector('.os-expand-icon');
+        if (!detailRow) return;
+
+        const isOpen = detailRow.style.display !== 'none';
+
+        // Fecha todos os outros
+        document.querySelectorAll('.os-detail-row').forEach(dr => dr.style.display = 'none');
+        document.querySelectorAll('.os-expand-icon').forEach(ic => { ic.textContent = '▶'; ic.style.color = ''; });
+        document.querySelectorAll('.os-row').forEach(r => r.classList.remove('os-row-open'));
+
+        if (!isOpen) {
+          detailRow.style.display = '';
+          if (icon) { icon.textContent = '▼'; icon.style.color = 'var(--primary)'; }
+          row.classList.add('os-row-open');
+          // Smooth scroll para o painel aparecer
+          setTimeout(() => detailRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 60);
+        }
+      });
+    });
+
+    // "Ver histórico completo" — auto-seleciona OS no filtro de histórico
+    document.querySelectorAll('.btn-ver-historico-os').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const osNumber = btn.dataset.osNumber;
+        // Scroll até o card de histórico
+        const histCard = document.getElementById('history-table-container');
+        if (histCard) {
+          histCard.closest('.card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          // Seta o SS de obra
+          setTimeout(() => {
+            const wrap = document.getElementById('history-obra-filter-wrap');
+            if (wrap) {
+              const inp = wrap.querySelector('.ss-input');
+              const hid = wrap.querySelector('.ss-hidden');
+              if (inp) inp.value = osNumber;
+              if (hid) hid.value = osNumber;
+              wrap.dispatchEvent(new CustomEvent('ss-change', { bubbles: true, detail: { value: osNumber, text: osNumber } }));
+            }
+          }, 400);
+        }
       });
     });
   }
