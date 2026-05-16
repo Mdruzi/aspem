@@ -2,7 +2,6 @@
 // views.js - Renderização das telas (parte 1)
 
 function renderLogin(errorMsg) {
-  const users = getUsers();
   return `
   <div class="login-wrap">
     <div class="login-card">
@@ -22,20 +21,6 @@ function renderLogin(errorMsg) {
         ${errorMsg ? `<div class="login-error">⚠ ${errorMsg}</div>` : ''}
         <button type="submit" class="btn btn-primary full-width">Entrar</button>
       </form>
-
-      <div class="login-separator" style="margin: 20px 0;">OU ACESSE COM</div>
-      
-      <div class="login-demo-grid">
-        ${users.map(u => `
-          <button class="login-demo-btn" data-user="${u.username}" aria-label="Entrar como ${u.name}">
-            <div class="avatar" style="width:28px;height:28px;font-size:10px">${u.avatar}</div>
-            <div style="text-align:left">
-              <div class="login-demo-name">${u.name}</div>
-              <div class="login-demo-role">${ROLES[u.role]}</div>
-            </div>
-          </button>
-        `).join('')}
-      </div>
     </div>
   </div>`;
 }

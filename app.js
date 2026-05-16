@@ -1111,41 +1111,81 @@ function bindObrasPanel() {
     bindOSModal();
   });
 
-  // Clientes
-  document.querySelectorAll('.obra-toggle').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = parseInt(btn.dataset.obraId);
-      const c = getClientes().find(x => x.id === id);
-      if (c) { updateCliente(id, { active: !c.active }); render(); }
-    });
-  });
-  document.querySelectorAll('.obra-delete').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (confirm('Excluir este cliente e todas as suas OS?')) {
-        deleteCliente(parseInt(btn.dataset.obraId));
-        showToast('Cliente removido.');
-        render();
-      }
-    });
-  });
+  // ── Busca unificada na tabela de clientes/OS ──
+  const obrasSearch = document.getElementById('obras-search');
+  const unifiedTableContainer = document.getElementById('obras-unified-table');
 
-  // OSes
-  document.querySelectorAll('.os-toggle').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = parseInt(btn.dataset.osId);
-      const o = getOSById(id);
-      if (o) { updateOS(id, { active: !o.active }); render(); }
-    });
-  });
-  document.querySelectorAll('.os-delete').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (confirm('Excluir esta OS?')) {
-        deleteOS(parseInt(btn.dataset.osId));
-        showToast('OS removida.');
-        render();
+  function refreshObrasTable() {
+    const q = (obrasSearch?.value || '').toLowerCase().trim();
+    const clientes = getClientes();
+    const oses     = getOSes();
+    const rows = [];
+    clientes.forEach(c => {
+      const clienteOses = oses.filter(o => o.clienteId === c.id);
+      const clienteMatch = !q || c.name.toLowerCase().includes(q);
+      clienteOses.forEach(o => {
+        const osMatch = !q || o.osNumber.toLowerCase().includes(q) || o.description.toLowerCase().includes(q);
+        if (q && !clienteMatch && !osMatch) return;
+        rows.push({ cliente: c, os: o });
+      });
+      if (clienteOses.length === 0 && (!q || clienteMatch)) {
+        rows.push({ cliente: c, os: null });
       }
     });
-  });
+    if (unifiedTableContainer) unifiedTableContainer.innerHTML = renderObrasUnifiedTable(rows);
+    bindObrasTableHandlers();
+  }
+
+  obrasSearch?.addEventListener('input', debounce(refreshObrasTable, 200));
+
+  function bindObrasTableHandlers() {
+    // Clientes
+    document.querySelectorAll('.obra-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = parseInt(btn.dataset.obraId);
+        const c = getClientes().find(x => x.id === id);
+        if (c) { updateCliente(id, { active: !c.active }); refreshObrasTable(); }
+      });
+    });
+    document.querySelectorAll('.obra-delete').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (confirm('Excluir este cliente e todas as suas OS?')) {
+          deleteCliente(parseInt(btn.dataset.obraId));
+          showToast('Cliente removido.');
+          refreshObrasTable();
+        }
+      });
+    });
+    // OSes
+    document.querySelectorAll('.os-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = parseInt(btn.dataset.osId);
+        const o = getOSById(id);
+        if (o) { updateOS(id, { active: !o.active }); refreshObrasTable(); }
+      });
+    });
+    document.querySelectorAll('.os-delete').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (confirm('Excluir esta OS?')) {
+          deleteOS(parseInt(btn.dataset.osId));
+          showToast('OS removida.');
+          refreshObrasTable();
+        }
+      });
+    });
+    // Adicionar OS para cliente específico
+    document.querySelectorAll('.btn-add-os-for-cliente').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const clienteId   = parseInt(btn.dataset.clienteId);
+        const clienteName = btn.dataset.clienteName || '';
+        overlay.innerHTML = renderAddOSModalForCliente(clienteId, clienteName);
+        overlay.classList.remove('hidden');
+        bindOSModalForCliente(clienteId);
+      });
+    });
+  }
+
+  bindObrasTableHandlers();
 
   // Inicializa searchable selects do painel
   initSearchableSelects();
@@ -1285,10 +1325,15 @@ function bindObraModal() {
   document.getElementById('modal-close2')?.addEventListener('click', closeModal);
 
   document.getElementById('btn-save-obra')?.addEventListener('click', () => {
-    const name = document.getElementById('obra-name').value.trim();
-    if (!name) { showToast('Informe o nome do cliente.', 'error'); return; }
-    addCliente(name);
-    showToast('Cliente adicionado com sucesso!');
+    const name        = document.getElementById('obra-name').value.trim();
+    const osNumber    = document.getElementById('obra-os-number').value.trim();
+    const description = document.getElementById('obra-os-description').value.trim();
+    if (!name)        { showToast('Informe o nome do cliente.', 'error'); return; }
+    if (!osNumber)    { showToast('Informe o número da OS.', 'error'); return; }
+    if (!description) { showToast('Informe a descrição da obra.', 'error'); return; }
+    const novoCliente = addCliente(name);
+    addOS({ clienteId: novoCliente.id, osNumber, description });
+    showToast('Cliente e OS criados com sucesso!');
     closeModal(); render();
   });
 }
@@ -1305,6 +1350,22 @@ function bindOSModal() {
     const osNumber   = document.getElementById('os-number').value.trim();
     const description= document.getElementById('os-description').value.trim();
     if (!clienteId)   { showToast('Selecione o cliente.', 'error'); return; }
+    if (!osNumber)    { showToast('Informe o número da OS.', 'error'); return; }
+    if (!description) { showToast('Informe a descrição da obra.', 'error'); return; }
+    addOS({ clienteId, osNumber, description });
+    showToast('OS criada com sucesso!');
+    closeModal(); render();
+  });
+}
+
+function bindOSModalForCliente(clienteId) {
+  const closeModal = () => { overlay.classList.add('hidden'); overlay.innerHTML=''; };
+  document.getElementById('modal-close')?.addEventListener('click', closeModal);
+  document.getElementById('modal-close2')?.addEventListener('click', closeModal);
+
+  document.getElementById('btn-save-os')?.addEventListener('click', () => {
+    const osNumber    = document.getElementById('os-number').value.trim();
+    const description = document.getElementById('os-description').value.trim();
     if (!osNumber)    { showToast('Informe o número da OS.', 'error'); return; }
     if (!description) { showToast('Informe a descrição da obra.', 'error'); return; }
     addOS({ clienteId, osNumber, description });

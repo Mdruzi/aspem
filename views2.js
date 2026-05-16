@@ -617,9 +617,90 @@ function renderAddMaterialModal() {
   </div>`;
 }
 
+function renderObrasUnifiedTable(rows) {
+  if (!rows.length) return `<div class="empty-state" style="padding:40px">
+    <div class="empty-state-icon">🔎</div>
+    <div class="empty-state-title">Nenhum resultado encontrado</div>
+  </div>`;
+
+  // Group by cliente for visual separation
+  let lastClienteId = null;
+  const rowsHtml = rows.map(({ cliente: c, os: o }) => {
+    const isNewGroup = c.id !== lastClienteId;
+    lastClienteId = c.id;
+    if (!o) {
+      // Client without any OS
+      return `
+      ${isNewGroup ? `<tr class="obras-group-header"><td colspan="5" style="background:#F8FAFC;padding:10px 16px;font-weight:700;font-size:13px;color:var(--primary);border-bottom:1px solid var(--border)">
+        🏢 ${c.name}
+        <span class="badge" style="margin-left:8px;background:${c.active?'#ECFDF5':'#FEF2F2'};color:${c.active?'#10B981':'#EF4444'}">${c.active?'Ativo':'Inativo'}</span>
+        <button class="btn btn-secondary btn-sm obra-toggle" data-obra-id="${c.id}" style="margin-left:8px">${c.active?'Desativar':'Ativar'}</button>
+        <button class="btn btn-danger btn-sm obra-delete" data-obra-id="${c.id}" title="Excluir cliente" style="margin-left:4px">🗑</button>
+      </td></tr>` : ''}
+      <tr><td colspan="5" style="padding:10px 16px;color:var(--text-muted);font-size:12px">Nenhuma OS cadastrada — <button class="btn-link btn-add-os-for-cliente" data-cliente-id="${c.id}" data-cliente-name="${c.name.replace(/"/g,'&quot;')}">+ Adicionar OS</button></td></tr>`;
+    }
+    return `
+    ${isNewGroup ? `<tr class="obras-group-header"><td colspan="5" style="background:#F8FAFC;padding:10px 16px;font-weight:700;font-size:13px;color:var(--primary);border-bottom:1px solid var(--border)">
+      🏢 ${c.name}
+      <span class="badge" style="margin-left:8px;background:${c.active?'#ECFDF5':'#FEF2F2'};color:${c.active?'#10B981':'#EF4444'}">${c.active?'Ativo':'Inativo'}</span>
+      <button class="btn btn-secondary btn-sm obra-toggle" data-obra-id="${c.id}" style="margin-left:8px">${c.active?'Desativar':'Ativar'}</button>
+      <button class="btn btn-danger btn-sm obra-delete" data-obra-id="${c.id}" title="Excluir cliente" style="margin-left:4px">🗑</button>
+      <button class="btn btn-primary btn-sm btn-add-os-for-cliente" data-cliente-id="${c.id}" data-cliente-name="${c.name.replace(/"/g,'&quot;')}" style="margin-left:8px">+ OS</button>
+    </td></tr>` : ''}
+    <tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:10px 16px 10px 28px;font-family:'Courier New',monospace;font-weight:700;white-space:nowrap">${o.osNumber}</td>
+      <td style="padding:10px 16px">${o.description}</td>
+      <td style="padding:10px 8px;text-align:center">
+        <span class="badge" style="background:${o.active?'#ECFDF5':'#FEF2F2'};color:${o.active?'#10B981':'#EF4444'}">${o.active?'Ativa':'Inativa'}</span>
+      </td>
+      <td style="padding:10px 16px;text-align:right;white-space:nowrap">
+        <button class="btn btn-secondary btn-sm os-toggle" data-os-id="${o.id}">${o.active?'Desativar':'Ativar'}</button>
+        <button class="btn btn-danger btn-sm os-delete" data-os-id="${o.id}" title="Excluir OS" style="margin-left:4px">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  return `<table style="width:100%;border-collapse:collapse">
+    <thead>
+      <tr style="background:#F8FAFC;border-bottom:2px solid var(--border)">
+        <th style="padding:10px 16px 10px 28px;text-align:left;font-size:12px;color:var(--text-muted);font-weight:600">Nº OS</th>
+        <th style="padding:10px 16px;text-align:left;font-size:12px;color:var(--text-muted);font-weight:600">Descrição</th>
+        <th style="padding:10px 8px;text-align:center;font-size:12px;color:var(--text-muted);font-weight:600">Status</th>
+        <th style="padding:10px 16px;text-align:right;font-size:12px;color:var(--text-muted);font-weight:600">Ações</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>${rowsHtml}</tbody>
+  </table>`;
+}
+
 function renderObrasPanel(user) {
   const clientes = getClientes();
   const oses     = getOSes();
+
+  // Build unified rows: one row per OS, with client info
+  function buildUnifiedRows(filterText) {
+    const q = (filterText || '').toLowerCase().trim();
+    const rows = [];
+    clientes.forEach(c => {
+      const clienteOses = oses.filter(o => o.clienteId === c.id);
+      // match by client name or by any OS number
+      const clienteMatch = !q || c.name.toLowerCase().includes(q);
+      clienteOses.forEach(o => {
+        const osMatch = !q || o.osNumber.toLowerCase().includes(q) || o.description.toLowerCase().includes(q);
+        if (q && !clienteMatch && !osMatch) return;
+        rows.push({ cliente: c, os: o });
+      });
+      // show client with no OSes if client name matches and no text or search matches client
+      if (clienteOses.length === 0 && (!q || clienteMatch)) {
+        rows.push({ cliente: c, os: null });
+      }
+    });
+    return rows;
+  }
+
+  const rows = buildUnifiedRows('');
+
   return `
   <div id="obras-panel-view">
     <div class="toolbar" style="margin-bottom:16px">
@@ -627,55 +708,19 @@ function renderObrasPanel(user) {
       <button class="btn btn-secondary" id="btn-open-add-os" style="margin-left:8px">+ Nova OS</button>
     </div>
 
-    <!-- Clientes -->
+    <!-- Clientes / OS — tabela unificada -->
     <div class="card" style="margin-bottom:20px">
-      <div class="card-header"><div class="card-title">🏢 Clientes</div></div>
-      <div class="card-body">
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Cliente</th><th>OSes</th><th>Status</th><th style="text-align:right">Ações</th></tr></thead>
-            <tbody>
-              ${clientes.map(c => {
-                const qtdOS = oses.filter(o=>o.clienteId===c.id).length;
-                return `<tr>
-                  <td class="fw-bold">${c.name}</td>
-                  <td style="color:var(--text-muted)">${qtdOS} OS${qtdOS!==1?'s':''}</td>
-                  <td><span class="badge" style="background:${c.active?'#ECFDF5':'#FEF2F2'};color:${c.active?'#10B981':'#EF4444'}">${c.active?'Ativo':'Inativo'}</span></td>
-                  <td style="text-align:right">
-                    <button class="btn btn-secondary btn-sm obra-toggle" data-obra-id="${c.id}">${c.active?'Desativar':'Ativar'}</button>
-                    <button class="btn btn-danger btn-sm obra-delete" data-obra-id="${c.id}" title="Excluir cliente">🗑</button>
-                  </td>
-                </tr>`;
-              }).join('')}
-            </tbody>
-          </table>
+      <div class="card-header" style="flex-wrap:wrap;gap:10px">
+        <div class="card-title">🏢 Clientes e Ordens de Serviço</div>
+        <div style="flex:1;min-width:200px;max-width:360px">
+          <input id="obras-search" class="input search-input"
+            placeholder="🔍 Buscar por cliente ou nº OS..."
+            style="width:100%;font-size:15px" autocomplete="off" />
         </div>
       </div>
-    </div>
-
-    <!-- OSes -->
-    <div class="card" style="margin-bottom:20px">
-      <div class="card-header"><div class="card-title">📋 Ordens de Serviço</div></div>
-      <div class="card-body">
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>OS</th><th>Descrição</th><th>Cliente</th><th>Status</th><th style="text-align:right">Ações</th></tr></thead>
-            <tbody>
-              ${oses.map(o => {
-                const cli = clientes.find(c=>c.id===o.clienteId);
-                return `<tr>
-                  <td class="fw-bold font-mono">${o.osNumber}</td>
-                  <td>${o.description}</td>
-                  <td style="color:var(--text-muted)">${cli?.name||'—'}</td>
-                  <td><span class="badge" style="background:${o.active?'#ECFDF5':'#FEF2F2'};color:${o.active?'#10B981':'#EF4444'}">${o.active?'Ativa':'Inativa'}</span></td>
-                  <td style="text-align:right">
-                    <button class="btn btn-secondary btn-sm os-toggle" data-os-id="${o.id}">${o.active?'Desativar':'Ativar'}</button>
-                    <button class="btn btn-danger btn-sm os-delete" data-os-id="${o.id}" title="Excluir OS">🗑</button>
-                  </td>
-                </tr>`;
-              }).join('')}
-            </tbody>
-          </table>
+      <div class="card-body" style="padding:0">
+        <div class="table-wrap" id="obras-unified-table">
+          ${renderObrasUnifiedTable(rows)}
         </div>
       </div>
     </div>
@@ -833,22 +878,37 @@ function renderObraHistoryTable(filter, reqs) {
 
 function renderAddObraModal() {
   return `
-  <div class="modal">
+  <div class="modal" style="max-width:540px">
     <div class="modal-header">
-      <div class="modal-title">🏢 Novo Cliente</div>
+      <div class="modal-title">🏢 Novo Cliente + OS</div>
       <button class="modal-close" id="modal-close">×</button>
     </div>
     <div class="modal-body">
-      <div class="form-row">
+      <div class="form-row" style="margin-bottom:14px">
         <div>
-          <label class="field-label">Nome do Cliente *</label>
+          <label class="field-label">Nome do Cliente <span style="color:var(--danger)">*</span></label>
           <input id="obra-name" class="input" placeholder="Ex: Construtora Horizonte S.A." />
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--border);margin:16px 0 14px;padding-top:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">
+          📋 Primeira OS (obrigatória)
+        </div>
+        <div class="form-row form-row-2" style="margin-bottom:14px">
+          <div>
+            <label class="field-label">Número da OS <span style="color:var(--danger)">*</span></label>
+            <input id="obra-os-number" class="input" placeholder="Ex: 1001" type="text" inputmode="numeric" />
+          </div>
+          <div>
+            <label class="field-label">Descrição da Obra <span style="color:var(--danger)">*</span></label>
+            <input id="obra-os-description" class="input" placeholder="Ex: SPDA — Bloco C" />
+          </div>
         </div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" id="modal-close2">Cancelar</button>
-      <button class="btn btn-primary" id="btn-save-obra">Salvar Cliente</button>
+      <button class="btn btn-primary" id="btn-save-obra">Salvar Cliente e OS</button>
     </div>
   </div>`;
 }
@@ -879,6 +939,34 @@ function renderAddOSModal() {
         <div>
           <label class="field-label">Descrição da Obra *</label>
           <input id="os-description" class="input" placeholder="Ex: SPDA e aterramento — Bloco C" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="modal-close2">Cancelar</button>
+      <button class="btn btn-primary" id="btn-save-os">Salvar OS</button>
+    </div>
+  </div>`;
+}
+
+// ── MODAL: NOVA OS PRÉ-VINCULADA A UM CLIENTE ──────────────────
+function renderAddOSModalForCliente(clienteId, clienteName) {
+  return `
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title">📋 Nova OS — ${clienteName}</div>
+      <button class="modal-close" id="modal-close">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="os-cliente-id-fixed" value="${clienteId}" />
+      <div class="form-row form-row-2" style="margin-bottom:14px">
+        <div>
+          <label class="field-label">Número da OS <span style="color:var(--danger)">*</span></label>
+          <input id="os-number" class="input" placeholder="Ex: 1001" inputmode="numeric" />
+        </div>
+        <div>
+          <label class="field-label">Descrição <span style="color:var(--danger)">*</span></label>
+          <input id="os-description" class="input" placeholder="Ex: SPDA — Bloco C" />
         </div>
       </div>
     </div>
