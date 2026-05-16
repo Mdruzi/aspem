@@ -362,10 +362,8 @@ function renderSS(id, placeholder, opts, selectedValue = '') {
 }
 
 function renderItemRow(idx, categories, materials, item) {
-  const isOtros = item && item.category === '__outros__';
-  const selCat  = isOtros ? categories[0] : (item ? item.category : categories[0]);
-  const matsForCat = materials.filter(m => m.category === selCat);
-  const isCab  = selCat === 'Cabeamento';
+  const isOtros = item && (item.category === '__outros__' || item.matId === '__outros__');
+  const isCab   = item && item.category === 'Cabeamento';
 
   return `
   <div class="item-card" id="item-${idx}">
@@ -374,25 +372,40 @@ function renderItemRow(idx, categories, materials, item) {
       <button class="btn btn-danger btn-sm remove-item" data-idx="${idx}" aria-label="Remover item ${idx+1}" title="Remover item">×</button>
     </div>
     <div class="item-fields-grid">
-      <div>
-        <label class="field-label">Categoria</label>
-        <select class="select item-cat" data-idx="${idx}">
-          ${categories.map(c => `<option ${c===selCat?'selected':''}>${c}</option>`).join('')}
-          <option value="__outros__" ${isOtros?'selected':''}>➕ Outros (novo item)</option>
-        </select>
-      </div>
+
+      <!-- Campo único de busca por material -->
       <div class="item-mat-span">
         <label class="field-label">Material</label>
-        <select class="select item-mat" data-idx="${idx}" style="display:${isOtros?'none':''}">
-          ${matsForCat.map(m => `<option value="${m.id}" data-unit="${m.defaultUnit}" ${item&&item.matId===m.id?'selected':''}>${m.name}</option>`).join('')}
-        </select>
+        <div class="item-mat-ss" id="item-mat-ss-${idx}" style="position:relative">
+          <input type="text" class="input item-mat-text" data-idx="${idx}"
+            placeholder="Digite para buscar no catálogo..." autocomplete="off"
+            value="${isOtros ? '' : (item ? item.name||'' : '')}" />
+          <input type="hidden" class="item-mat-id" data-idx="${idx}"
+            value="${isOtros ? '__outros__' : (item && item.matId ? item.matId : '')}" />
+          <input type="hidden" class="item-mat-cat" data-idx="${idx}"
+            value="${isOtros ? '' : (item ? item.category||'' : '')}" />
+          <div class="ss-dropdown item-mat-dropdown">
+            <div style="padding:10px 12px;font-size:12px;color:var(--text-muted);font-style:italic">
+              Digite ao menos 2 letras para buscar...
+            </div>
+          </div>
+        </div>
         <!-- Campo "Outros": nome livre -->
-        <div class="item-outros-wrap" style="display:${isOtros?'':'none'}">
+        <div class="item-outros-wrap" style="display:${isOtros?'':'none'};margin-top:6px">
           <input class="input item-outros-name" data-idx="${idx}"
-            placeholder="Nome do material (ex: Caixa de passagem 4x2)" value="${item&&item.outrosName?item.outrosName:''}" />
+            placeholder="Nome do material..." value="${item&&item.outrosName?item.outrosName:item&&isOtros&&item.name?item.name:''}" />
           <div class="field-hint" style="margin-top:4px">Este item será salvo no catálogo para uso futuro.</div>
         </div>
       </div>
+
+      <!-- Classificação para itens "Outros" -->
+      <div class="item-outros-cat-wrap" style="display:${isOtros?'':'none'}">
+        <label class="field-label">Categoria <span style="color:var(--danger)">*</span></label>
+        <select class="select item-outros-cat" data-idx="${idx}">
+          ${FIXED_CATEGORIES.map(c => `<option>${c}</option>`).join('')}
+        </select>
+      </div>
+
       <div>
         <label class="field-label">Quantidade</label>
         <input class="input item-qty" data-idx="${idx}" type="number" placeholder="0" min="1" value="${item?item.qty:''}" />
@@ -403,25 +416,18 @@ function renderItemRow(idx, categories, materials, item) {
           ${UNITS.map(u => `<option ${item&&item.unit===u?'selected':''}>${u}</option>`).join('')}
         </select>
       </div>
-      <!-- Classificação para itens "Outros" -->
-      <div class="item-outros-cat-wrap" style="display:${isOtros?'':'none'}">
-        <label class="field-label">Classificar em <span style="color:var(--danger)">*</span></label>
-        <select class="select item-outros-cat" data-idx="${idx}">
-          ${FIXED_CATEGORIES.map(c => `<option>${c}</option>`).join('')}
-        </select>
-      </div>
       <div class="item-bitola-wrap" style="display:${isCab?'':'none'}">
         <label class="field-label">Bitola</label>
         <select class="select item-bitola" data-idx="${idx}">
-          <option value="">Selecione...</option>
-          ${['1,5mm²','2,5mm²','4,0mm²','6,0mm²','10mm²','16mm²','25mm²','35mm²','50mm²'].map(b => `<option ${item&&item.bitola===b?'selected':''}>${b}</option>`).join('')}
+          <option value="">—</option>
+          ${['1,5mm²','2,5mm²','4,0mm²','6,0mm²','10mm²','16mm²','25mm²','35mm²','50mm²','70mm²','95mm²','120mm²'].map(b => `<option ${item&&item.bitola===b?'selected':''}>${b}</option>`).join('')}
         </select>
       </div>
       <div class="item-color-wrap" style="display:${isCab?'':'none'}">
         <label class="field-label">Cor</label>
         <select class="select item-color" data-idx="${idx}">
-          <option value="">Selecione...</option>
-          ${['Azul','Verde','Preto','Amarelo','Vermelho'].map(col => `<option ${item&&item.color===col?'selected':''}>${col}</option>`).join('')}
+          <option value="">—</option>
+          ${['Azul','Amarelo/Verde','Preto','Vermelho','Branco','Cinza','Marrom','Laranja'].map(col => `<option ${item&&item.color===col?'selected':''}>${col}</option>`).join('')}
         </select>
       </div>
       <div class="item-obs-span">

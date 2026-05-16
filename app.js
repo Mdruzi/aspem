@@ -90,12 +90,89 @@ function rebuildSS(wrapId, newOpts, newPlaceholder) {
   if (hidden) hidden.value = '';
 }
 
-// Global outside-click: close all open SS dropdowns
+// Global outside-click: fecha SS dropdowns e dropdowns de material
 document.addEventListener('click', e => {
   if (!e.target.closest('.ss-wrap')) {
     document.querySelectorAll('.ss-wrap.ss-open').forEach(w => w.classList.remove('ss-open'));
   }
+  if (!e.target.closest('.item-mat-ss')) {
+    document.querySelectorAll('.item-mat-ss.ss-open').forEach(w => w.classList.remove('ss-open'));
+  }
 });
+
+// ── MATERIAL SEARCH (campo único por item de requisição) ─────
+function initMaterialSearch(idx, materials) {
+  const wrap    = document.getElementById(`item-mat-ss-${idx}`);
+  if (!wrap) return;
+  const textInput = wrap.querySelector('.item-mat-text');
+  const idHidden  = wrap.querySelector('.item-mat-id');
+  const catHidden = wrap.querySelector('.item-mat-cat');
+  const dropdown  = wrap.querySelector('.item-mat-dropdown');
+  if (!textInput || !dropdown) return;
+
+  const norm = s => s.toLowerCase()
+    .replace(/²/g,'2').replace(/³/g,'3').replace(/[áàâã]/g,'a').replace(/[éèê]/g,'e')
+    .replace(/[íì]/g,'i').replace(/[óòôõ]/g,'o').replace(/[úù]/g,'u').replace(/ç/g,'c');
+
+  const showDropdown = (query) => {
+    const q = norm(query.trim());
+    if (q.length < 2) {
+      dropdown.innerHTML = '<div style="padding:10px 12px;font-size:12px;color:var(--text-muted);font-style:italic">Digite ao menos 2 letras para buscar...</div>';
+      return;
+    }
+    const results = materials.filter(m => norm(m.name).includes(q) || norm(m.category).includes(q)).slice(0, 40);
+    const rows = results.map(m =>
+      `<div class="ss-option" data-mat-id="${m.id}" data-mat-unit="${m.defaultUnit}" data-mat-cat="${m.category}" data-mat-name="${m.name.replace(/"/g,'&quot;')}">
+        ${m.name}<span style="font-size:11px;color:var(--text-muted);margin-left:6px">· ${m.category}</span>
+      </div>`
+    ).join('');
+    const addNew = `<div class="ss-option" data-mat-id="__outros__" data-mat-unit="un" data-mat-cat="" data-mat-name=""
+      style="border-top:1px solid var(--border);color:var(--primary);font-weight:600;font-size:12px">
+      ➕ Não encontrado — cadastrar como novo material
+    </div>`;
+    dropdown.innerHTML = rows
+      ? rows + addNew
+      : `<div style="padding:10px 12px;font-size:12px;color:var(--text-muted)">Nenhum resultado para "${query}"</div>` + addNew;
+    wrap.classList.add('ss-open');
+  };
+
+  const applySelection = (matId, matName, matUnit, matCat) => {
+    const card = wrap.closest('.item-card');
+    idHidden.value  = matId;
+    catHidden.value = matCat;
+    wrap.classList.remove('ss-open');
+
+    const isOutros = matId === '__outros__';
+    textInput.value = isOutros ? '' : matName;
+
+    // Outros fields
+    card?.querySelector('.item-outros-wrap')?.setAttribute('style', isOutros ? 'display:;margin-top:6px' : 'display:none');
+    card?.querySelector('.item-outros-cat-wrap')?.setAttribute('style', isOutros ? '' : 'display:none');
+    if (isOutros) card?.querySelector('.item-outros-name')?.focus();
+
+    // Cabeamento fields
+    const isCab = matCat === 'Cabeamento';
+    card?.querySelector('.item-bitola-wrap')?.setAttribute('style', isCab ? '' : 'display:none');
+    card?.querySelector('.item-color-wrap')?.setAttribute('style',  isCab ? '' : 'display:none');
+
+    // Auto-set unit
+    if (!isOutros && matUnit) {
+      const unitSel = card?.querySelector('.item-unit');
+      if (unitSel) Array.from(unitSel.options).forEach(o => { o.selected = o.value === matUnit; });
+    }
+  };
+
+  textInput.addEventListener('focus', () => showDropdown(textInput.value));
+  textInput.addEventListener('input', () => {
+    idHidden.value = ''; catHidden.value = '';
+    showDropdown(textInput.value);
+  });
+  dropdown.addEventListener('click', e => {
+    const opt = e.target.closest('.ss-option');
+    if (!opt) return;
+    applySelection(opt.dataset.matId, opt.dataset.matName, opt.dataset.matUnit, opt.dataset.matCat);
+  });
+}
 
 // ── NAVIGATION GUARD ──────────────────────────────────────────
 function confirmNavigation() {
@@ -581,81 +658,43 @@ function bindNewReqView() {
   const categories = getMaterialCategories();
   const materials = getActiveMaterials();
 
-  const addItem = ()=>{
-    const idx = state.itemCount;
-    const container = document.getElementById('items-container');
-    const row = document.createElement('div');
-    row.innerHTML = renderItemRow(idx, categories, materials, null);
-    container.appendChild(row.firstElementChild);
-    state.itemCount++;
-    rebindItemHandlers();
+  const renumberItems = () => {
+    document.querySelectorAll('.item-card').forEach((card, i) => {
+      const numEl = card.querySelector('.item-number');
+      if (numEl) numEl.textContent = i + 1;
+    });
   };
 
-  const rebindItemHandlers = ()=>{
-    document.querySelectorAll('.item-cat').forEach(sel=>{
-      sel.onchange = e=>{
-        const idx = parseInt(sel.dataset.idx);
-        const cat = sel.value;
-        const isOutros = cat === '__outros__';
-
-        const matSel       = document.querySelector(`.item-mat[data-idx="${idx}"]`);
-        const outrosWrap   = document.querySelector(`#item-${idx} .item-outros-wrap`);
-        const outrosCatWrap= document.querySelector(`#item-${idx} .item-outros-cat-wrap`);
-
-        if (outrosWrap)    outrosWrap.style.display    = isOutros ? '' : 'none';
-        if (outrosCatWrap) outrosCatWrap.style.display = isOutros ? '' : 'none';
-        if (matSel)        matSel.style.display        = isOutros ? 'none' : '';
-
-        if (!isOutros && matSel) {
-          const matsForCat = materials.filter(m=>m.category===cat);
-          matSel.innerHTML = matsForCat.map(m=>`<option value="${m.id}" data-unit="${m.defaultUnit}">${m.name}</option>`).join('');
-          updateUnit(idx);
-        }
-
-        const bitolaWrap = document.querySelector(`.item-bitola[data-idx="${idx}"]`)?.closest('.item-bitola-wrap');
-        const colorWrap  = document.querySelector(`.item-color[data-idx="${idx}"]`)?.closest('.item-color-wrap');
-        if (bitolaWrap) bitolaWrap.style.display = cat==='Cabeamento' ? '' : 'none';
-        if (colorWrap)  colorWrap.style.display  = cat==='Cabeamento' ? '' : 'none';
-      };
-    });
-    document.querySelectorAll('.item-mat').forEach(sel=>{
-      sel.onchange = ()=>updateUnit(parseInt(sel.dataset.idx));
-    });
-    document.querySelectorAll('.remove-item').forEach(btn=>{
-      btn.onclick = ()=>{
-        if (document.querySelectorAll('.item-card').length<=1) return;
+  const bindRemoveButtons = () => {
+    document.querySelectorAll('.remove-item').forEach(btn => {
+      btn.onclick = () => {
+        if (document.querySelectorAll('.item-card').length <= 1) return;
         document.getElementById(`item-${btn.dataset.idx}`)?.remove();
         renumberItems();
       };
     });
   };
 
-  const updateUnit = idx=>{
-    const matSel = document.querySelector(`.item-mat[data-idx="${idx}"]`);
-    const unitSel = document.querySelector(`.item-unit[data-idx="${idx}"]`);
-    if (!matSel||!unitSel) return;
-    const opt = matSel.selectedOptions[0];
-    const u = opt?.dataset.unit||'un';
-    unitSel.value=u;
+  const addItemRow = (item = null) => {
+    const idx = state.itemCount;
+    const container = document.getElementById('items-container');
+    const row = document.createElement('div');
+    row.innerHTML = renderItemRow(idx, categories, materials, item);
+    container.appendChild(row.firstElementChild);
+    state.itemCount++;
+    initMaterialSearch(idx, materials);
+    bindRemoveButtons();
   };
 
-  const renumberItems = ()=>{
-    document.querySelectorAll('.item-card').forEach((card,i)=>{
-      const numEl = card.querySelector('.item-number');
-      if (numEl) numEl.textContent=i+1;
-    });
-  };
+  const addItem = () => addItemRow(null);
 
   // Initial item
-  const container = document.getElementById('items-container');
-  const row = document.createElement('div');
-  row.innerHTML = renderItemRow(0, categories, materials, null);
-  container.appendChild(row.firstElementChild);
-  rebindItemHandlers();
+  addItemRow(null);
 
-  // Expõe rebind e contexto para importação via câmera e voz
-  window._aspemRebindItems = rebindItemHandlers;
-  window._aspemCategories  = categories;
+  // Expõe para importação via câmera e voz
+  window._aspemAddItemRow    = addItemRow;
+  window._aspemCategories    = categories;
+  window._aspemRebindItems   = bindRemoveButtons; // compatibilidade
   window._aspemMaterials   = materials;
 
   document.getElementById('btn-add-item')?.addEventListener('click', addItem);
@@ -730,31 +769,45 @@ function bindNewReqView() {
 
     const items = [];
     let valid = true;
-    document.querySelectorAll('.item-card').forEach((row,i)=>{
+    document.querySelectorAll('.item-card').forEach((row, i) => {
       if (!valid) return;
-      const catSel  = row.querySelector('.item-cat');
-      const qtySel  = row.querySelector('.item-qty');
-      const unitSel = row.querySelector('.item-unit');
-      const obsSel  = row.querySelector('.item-obs');
-      const isOutros = catSel?.value === '__outros__';
+      const matIdHidden = row.querySelector('.item-mat-id');
+      const matCatHid   = row.querySelector('.item-mat-cat');
+      const matText     = row.querySelector('.item-mat-text')?.value.trim() || '';
+      const qtySel      = row.querySelector('.item-qty');
+      const unitSel     = row.querySelector('.item-unit');
+      const obsSel      = row.querySelector('.item-obs');
+      const matIdVal    = matIdHidden?.value || '';
+      const isOutros    = matIdVal === '__outros__';
+      const isFreeText  = !matIdVal && !!matText; // digitou mas não selecionou da lista
 
-      if (!qtySel.value) { valid = false; showToast('Informe a quantidade de todos os itens.', 'error'); return; }
+      if (!qtySel?.value) { valid = false; showToast('Informe a quantidade de todos os itens.', 'error'); return; }
 
       if (isOutros) {
+        // Material novo a ser cadastrado
         const outrosName = row.querySelector('.item-outros-name')?.value.trim();
-        const outrosCat  = row.querySelector('.item-outros-cat')?.value;
-        if (!outrosName) { valid = false; showToast('Informe o nome do material em "Outros".', 'error'); return; }
-        const newMat = addMaterial({ category: outrosCat, name: outrosName, defaultUnit: unitSel.value });
-        items.push({ id:i+1, category:outrosCat, name:outrosName, matId:newMat.id, qty:parseInt(qtySel.value), unit:unitSel.value, obs:obsSel?.value||'', bitola:null, color:null });
+        const outrosCat  = row.querySelector('.item-outros-cat')?.value || 'Infraestrutura';
+        if (!outrosName) { valid = false; showToast('Informe o nome do novo material.', 'error'); return; }
+        const newMat = addMaterial({ category: outrosCat, name: outrosName, defaultUnit: unitSel?.value || 'un' });
+        items.push({ id:i+1, category:outrosCat, name:outrosName, matId:newMat.id, qty:parseInt(qtySel.value), unit:unitSel?.value||'un', obs:obsSel?.value||'', bitola:null, color:null });
+
+      } else if (isFreeText) {
+        // Digitou nome livre sem selecionar — salva como novo material sem categoria definida
+        const newMat = addMaterial({ category: 'Infraestrutura', name: matText, defaultUnit: unitSel?.value || 'un' });
+        items.push({ id:i+1, category:'Infraestrutura', name:matText, matId:newMat.id, qty:parseInt(qtySel.value), unit:unitSel?.value||'un', obs:obsSel?.value||'', bitola:null, color:null });
+
+      } else if (matIdVal) {
+        // Material existente selecionado do catálogo
+        if (!matText && !matIdVal) { valid = false; showToast('Selecione o material de todos os itens.', 'error'); return; }
+        const cat       = matCatHid?.value || '';
+        const mat       = materials.find(m => m.id === parseInt(matIdVal));
+        const isCab     = cat === 'Cabeamento';
+        const bitola    = isCab ? (row.querySelector('.item-bitola')?.value || null) : null;
+        const color     = isCab ? (row.querySelector('.item-color')?.value  || null) : null;
+        items.push({ id:i+1, category:cat, name:mat?.name||matText, matId:parseInt(matIdVal), qty:parseInt(qtySel.value), unit:unitSel?.value||'un', obs:obsSel?.value||'', bitola, color });
+
       } else {
-        const matSel   = row.querySelector('.item-mat');
-        if (!matSel?.value) { valid = false; showToast('Selecione o material de todos os itens.', 'error'); return; }
-        const bitolaSel = row.querySelector('.item-bitola');
-        const colorSel  = row.querySelector('.item-color');
-        const mat = materials.find(m=>m.id===parseInt(matSel.value));
-        const bitola = catSel.value === 'Cabeamento' && bitolaSel ? bitolaSel.value : null;
-        const color  = catSel.value === 'Cabeamento' && colorSel  ? colorSel.value  : null;
-        items.push({ id:i+1, category:catSel.value, name:mat?.name||matSel.options[matSel.selectedIndex]?.text||'', matId:parseInt(matSel.value), qty:parseInt(qtySel.value), unit:unitSel.value, obs:obsSel?.value||'', bitola, color });
+        valid = false; showToast('Selecione ou digite o material de todos os itens.', 'error');
       }
     });
 

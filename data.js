@@ -35,7 +35,7 @@ const KEYS = {
 };
 
 // ── DATA RESET / MIGRATION ────────────────────────────────────
-const DATA_VERSION = 'v9';
+const DATA_VERSION = 'v10';
 if (localStorage.getItem('aspem_data_version') !== DATA_VERSION) {
   localStorage.clear();
   localStorage.setItem('aspem_data_version', DATA_VERSION);
@@ -11687,6 +11687,1378 @@ const DEFAULT_MATERIALS = [
     "defaultUnit": "un",
     "active": true,
     "id": 1658
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 1,5mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1659
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 1,5mm² — Amarelo/Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1660
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 1,5mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1661
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 1,5mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1662
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 1,5mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1663
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 1,5mm² — Cinza",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1664
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 1,5mm² — Marrom",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1665
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 1,5mm² — Laranja",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1666
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 2,5mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1667
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 2,5mm² — Amarelo/Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1668
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 2,5mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1669
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 2,5mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1670
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 2,5mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1671
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 2,5mm² — Cinza",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1672
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 2,5mm² — Marrom",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1673
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 2,5mm² — Laranja",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1674
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 4,0mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1675
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 4,0mm² — Amarelo/Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1676
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 4,0mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1677
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 4,0mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1678
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 4,0mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1679
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 4,0mm² — Cinza",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1680
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 4,0mm² — Marrom",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1681
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 4,0mm² — Laranja",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1682
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 6,0mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1683
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 6,0mm² — Amarelo/Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1684
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 6,0mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1685
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 6,0mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1686
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 6,0mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1687
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 6,0mm² — Cinza",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1688
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 6,0mm² — Marrom",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1689
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 6,0mm² — Laranja",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1690
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 10mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1691
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 10mm² — Amarelo/Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1692
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 10mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1693
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 10mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1694
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 10mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1695
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 10mm² — Cinza",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1696
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 10mm² — Marrom",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1697
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 10mm² — Laranja",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1698
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 16mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1699
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 16mm² — Amarelo/Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1700
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 16mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1701
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 16mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1702
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 16mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1703
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 16mm² — Cinza",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1704
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 16mm² — Marrom",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1705
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 16mm² — Laranja",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1706
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 25mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1707
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 25mm² — Amarelo/Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1708
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 25mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1709
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 25mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1710
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 25mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1711
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 25mm² — Cinza",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1712
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 25mm² — Marrom",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1713
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 25mm² — Laranja",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1714
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 35mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1715
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 35mm² — Amarelo/Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1716
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 35mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1717
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 35mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1718
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 35mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1719
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 35mm² — Cinza",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1720
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 35mm² — Marrom",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1721
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 35mm² — Laranja",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1722
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 50mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1723
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 50mm² — Amarelo/Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1724
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 50mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1725
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 50mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1726
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 50mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1727
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 50mm² — Cinza",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1728
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 50mm² — Marrom",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1729
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 50mm² — Laranja",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1730
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 70mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1731
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 70mm² — Amarelo/Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1732
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 70mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1733
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 70mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1734
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 70mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1735
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 70mm² — Cinza",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1736
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 70mm² — Marrom",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1737
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 70mm² — Laranja",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1738
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 95mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1739
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 95mm² — Amarelo/Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1740
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 95mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1741
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 95mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1742
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 95mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1743
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 95mm² — Cinza",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1744
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 95mm² — Marrom",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1745
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 95mm² — Laranja",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1746
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 120mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1747
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 120mm² — Amarelo/Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1748
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 120mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1749
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 120mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1750
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 120mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1751
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 120mm² — Cinza",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1752
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 120mm² — Marrom",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1753
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 120mm² — Laranja",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1754
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 150mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1755
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 150mm² — Amarelo/Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1756
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 150mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1757
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 150mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1758
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 150mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1759
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 150mm² — Cinza",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1760
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 150mm² — Marrom",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1761
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 150mm² — Laranja",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1762
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 185mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1763
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 185mm² — Amarelo/Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1764
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 185mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1765
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 185mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1766
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 185mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1767
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 185mm² — Cinza",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1768
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 185mm² — Marrom",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1769
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 185mm² — Laranja",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1770
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 240mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1771
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 240mm² — Amarelo/Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1772
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 240mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1773
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 240mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1774
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 240mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1775
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 240mm² — Cinza",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1776
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 240mm² — Marrom",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1777
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo THHN unipolar 240mm² — Laranja",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1778
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo PP 2x1,5mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1779
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo PP 2x2,5mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1780
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo PP 3x1,5mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1781
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo PP 3x2,5mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1782
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo PP 3x4,0mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1783
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo PP 4x2,5mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1784
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo PP 4x4,0mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1785
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo PP 4x6,0mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1786
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo PP 5x2,5mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1787
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo PP 5x4,0mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1788
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo de controle 4x1,5mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1789
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo de controle 7x1,5mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1790
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo de controle 10x1,5mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1791
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo de controle 12x1,5mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1792
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo de controle 14x1,5mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1793
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo de controle 19x1,5mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1794
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo de controle 24x1,5mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1795
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo de controle 4x2,5mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1796
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo de controle 7x2,5mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1797
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 1,5mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1798
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 1,5mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1799
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 1,5mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1800
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 1,5mm² — Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1801
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 1,5mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1802
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 1,5mm² — Amarelo",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1803
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 2,5mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1804
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 2,5mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1805
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 2,5mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1806
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 2,5mm² — Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1807
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 2,5mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1808
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 2,5mm² — Amarelo",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1809
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 4,0mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1810
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 4,0mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1811
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 4,0mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1812
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 4,0mm² — Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1813
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 4,0mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1814
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 4,0mm² — Amarelo",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1815
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 6,0mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1816
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 6,0mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1817
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 6,0mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1818
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 6,0mm² — Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1819
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 6,0mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1820
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 6,0mm² — Amarelo",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1821
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 10mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1822
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 10mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1823
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 10mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1824
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 10mm² — Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1825
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 10mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1826
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 10mm² — Amarelo",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1827
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 16mm² — Azul",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1828
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 16mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1829
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 16mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1830
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 16mm² — Verde",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1831
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 16mm² — Branco",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1832
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fio rígido isolado 16mm² — Amarelo",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1833
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo UTP Cat5e",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1834
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo UTP Cat6",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1835
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo UTP Cat6A",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1836
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo FTP Cat6",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1837
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo SFTP Cat7",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1838
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo Coaxial RG58",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1839
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo Coaxial RG6",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1840
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo Fibra óptica monomodo 2FO",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1841
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo Fibra óptica monomodo 4FO",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1842
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo Fibra óptica monomodo 8FO",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1843
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo Fibra óptica multimodo 4FO",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1844
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo para CFTV coaxial + alimentação",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1845
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo para sistema de alarme 4x0,50mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1846
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo para PABX/telefonia CCI 2 pares",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1847
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo para PABX/telefonia CCI 4 pares",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1848
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo solar fotovoltaico 6mm² — Vermelho",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1849
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo solar fotovoltaico 6mm² — Preto",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1850
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo de aço galvanizado menságeiro 1/4\"",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1851
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo de aterramento nu 50mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1852
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Cabo de aterramento nu 70mm²",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1853
+  },
+  {
+    "category": "Cabeamento",
+    "name": "Fita de cobre nua 30x3mm",
+    "defaultUnit": "m",
+    "active": true,
+    "id": 1854
   }
 ];
 
